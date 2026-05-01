@@ -1,61 +1,42 @@
 # Gemma-Harness
 
-A lightweight, VRAM-optimized autonomous AI software engineer harness designed to run locally via Ollama. 
+A lightweight, VRAM-optimized autonomous AI software engineer harness designed to run on (my) laptop via Ollama. 
 
-Built specifically for environments with strict VRAM limits (e.g., 6 GB), this harness employs an intelligent Context Manager that actively compresses, prunes, and summarizes conversation history to prevent Out of Memory (OOM) crashes while maintaining the agent's contextual awareness.
+I have an ASUS with an RTX 3060, with 6 GB VRAM (which can run basic quantized LLMs) and I wanted to experiement with local agentic AI. 
+RTX hardware is absolutely amazing for inference, therefore I believe it would be theoretically possible, with enough optimization, to run an agentic loop and design a capable harness to use the model and perform (some) local autonomous software engineering, tool calls, and what have you.
+
+The harness thus employs an intelligent Context Manager that actively compresses, prunes, and summarizes conversation history to prevent Out of Memory (OOM) crashes while maintaining the agent's contextual awareness, akin to industry-standard agentic frameworks.
 
 ## Features
 
-* **Autonomous ReAct Loop:** Employs a continuous Thought → Action → Observation loop to explore codebases, fix bugs, and run tests.
-* **VRAM Guardrails (Sliding Window):** Automatically monitors token usage. At 80% capacity, it aggressively prunes `<|think|>` reasoning blocks and uses background LLM calls to summarize older conversational history.
-* **Sandboxed Tool Execution:** Prevents accidental codebase destruction or malicious shell commands via a strict `harness_config.json` whitelist.
-* **Rich Terminal UI:** Provides a beautiful, streaming, multi-colored interface directly in your integrated terminal (e.g., VS Code).
-* **Precise File Operations:** Uses exact string replacement (`write_or_replace`) and targeted line reading to manipulate files safely.
+* **Autonomous ReAct loop:** Employs a continuous Thought → Action → Observation loop to explore codebases, fix bugs, and run tests.
+* **The strict VRAM guardrails (uses the Sliding Window approach):** Automatically monitors token usage. At 80% capacity, it aggressively prunes `<|think|>` reasoning blocks and uses background LLM calls to summarize older conversational history.
+* **Sandboxed tool execution:** Prevents accidental codebase destruction or malicious shell commands via a strict `harness_config.json` whitelist.
+* **Rich terminal UI:** Provides a beautiful, streaming, multi-colored interface directly in my integrated terminal (works with my VS Code instance).
+* **Precise file operations:** Uses exact string replacement (`write_or_replace`) and targeted line reading to manipulate files safely.
 
-## Project Structure
-
-```text
-gemma-harness/
-│
-├── harness/                    # Core application package
-│   ├── __init__.py
-│   ├── orchestrator.py         # The ReAct loop and state machine
-│   ├── llm_client.py           # Handles HTTP requests to the Ollama API
-│   ├── context_manager.py      # Token counting, sliding window, and summarization
-│   ├── prompt.py               # Immutable system instructions & persona
-│   ├── tools/                  # The tool registry
-│   │   ├── __init__.py
-│   │   ├── base.py             # Tool schemas and routing logic
-│   │   ├── file_ops.py         # read_lines, write_replace, list_dir
-│   │   └── terminal.py         # execute_command with strict whitelisting
-│   └── ui.py                   # The Rich terminal interface
-│
-├── harness_config.json         # Workspace-specific config (tool whitelists) (User generated)
-├── main.py                     # Entry point to launch the CLI
-└── requirements.txt            # Project dependencies
-```
 
 ## Setup & Installation
 
-1. **Install Dependencies:**
+1. **Installing dependencies:**
    ```bash
    pip install -r requirements.txt
    ```
-2. **Hugging Face Authentication (Optional but Recommended):**
+2. **HuggingFace Authentication (Optional but I recommend it for optimal tokenization):**
    To ensure 100% accurate token counting for the Context Manager, authenticate your environment with Hugging Face so the `transformers` library can download the Gemma tokenizer.
    ```bash
    pip install -U "huggingface_hub[cli]"
    huggingface-cli login
    ```
-3. **Configure Your Workspace Sandbox:**
-   Create a `harness_config.json` file in the root directory where you plan to run the agent, defining the permitted terminal commands:
+3. **Configure Workspace sandbox:**
+   A `harness_config.json` file in the root directory must be created before running the agent, defining the permitted terminal commands:
    ```json
    {
      "allowed_commands": ["ls", "cat", "echo", "pwd", "pytest", "git", "python"]
    }
    ```
 4. **Start Ollama:**
-   Ensure your local Ollama server is running and the target model is available (e.g., `gemma4:e4b`).
+   Local Ollama server running and the target model is available (I run `gemma4:e4b`).
    ```bash
    ollama serve
    ```
