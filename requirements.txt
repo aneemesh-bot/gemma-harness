@@ -1,0 +1,11 @@
+# Ollama API communication
+requests>=2.31.0
+
+# Terminal UI and formatting
+rich>=13.7.0
+
+# Token counting for VRAM management
+transformers>=4.38.0
+
+# Tool schema validation
+pydantic>=2.6.0
