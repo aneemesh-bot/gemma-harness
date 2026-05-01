@@ -9,3 +9,6 @@ transformers>=4.38.0
 
 # Tool schema validation
 pydantic>=2.6.0
+
+# PyTest
+pytest>=9.0.3
