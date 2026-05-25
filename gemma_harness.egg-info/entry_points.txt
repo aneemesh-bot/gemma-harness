@@ -1,0 +1,2 @@
+[console_scripts]
+gemma-harness = harness.cli:main
