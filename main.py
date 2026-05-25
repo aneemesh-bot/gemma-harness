@@ -1,6 +1,7 @@
 # gemma-harness/main.py
 
 import argparse
+import readline  # noqa: F401 — enables arrow-key navigation and history in input()
 from rich.console import Console
 from harness.orchestrator import AgentOrchestrator
 from harness.session import load_session, clear_session
