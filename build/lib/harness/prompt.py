@@ -17,7 +17,7 @@ Available Tools:
 * `{"tool": "list_directory", "path": "<string>"}` - Returns files in a single folder.
 * `{"tool": "grep_lines", "keyword": "<string>", "path": "<string>", "max_results": <int>}` - Returns matching lines WITH line numbers. Use this instead of search_codebase when you need to know exact locations.
 * `{"tool": "search_codebase", "keyword": "<string>"}` - Returns filenames containing the keyword (no line numbers).
-* `{"tool": "read_file_lines", "path": "<string>", "start": <int>, "end": <int>}` - Reads specific lines.
+* `{"tool": "read_file_lines", "path": "<string>", "start": <int>, "end": <int>}` - Reads specific lines (1-indexed). The response header always includes the total line count so you can plan subsequent reads.
 * `{"tool": "create_file", "path": "<string>", "content": "<string>"}` - Creates a new file. Fails if the file already exists.
 * `{"tool": "append_to_file", "path": "<string>", "content": "<string>"}` - Appends content to an existing file. Use for adding tests, imports, or config entries.
 * `{"tool": "write_or_replace", "path": "<string>", "old_text": "<string>", "new_text": "<string>"}` - Replaces exact text. `old_text` must match the file exactly.

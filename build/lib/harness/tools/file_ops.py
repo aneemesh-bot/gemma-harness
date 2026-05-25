@@ -32,14 +32,34 @@ def search_codebase(keyword: str, path: str = ".") -> str:
         return f"Error searching codebase: {str(e)}"
 
 def read_file_lines(path: str, start: int, end: int) -> str:
-    try:
-        with open(path, 'r', encoding='utf-8') as f:
-            lines = f.readlines()
-        # Ensure 1-indexed logic for the model
-        snippet = lines[start-1:end]
-        return f"--- {path} (Lines {start}-{end}) ---\n" + "".join(snippet)
-    except Exception as e:
-        return f"Error reading file lines: {str(e)}"
+    start = max(1, start)
+    if end < start:
+        return f"[TOOL_ERROR] end ({end}) must be >= start ({start})."
+
+    for encoding in ("utf-8", "latin-1"):
+        try:
+            with open(path, "r", encoding=encoding) as f:
+                lines = f.readlines()
+            encoding_note = "" if encoding == "utf-8" else " [read as latin-1 — file is not valid UTF-8]"
+            break
+        except UnicodeDecodeError:
+            continue
+        except Exception as e:
+            return f"Error reading file lines: {str(e)}"
+    else:
+        return f"Error reading file lines: could not decode '{path}' as UTF-8 or latin-1."
+
+    total = len(lines)
+    if start > total:
+        return (
+            f"[TOOL_ERROR] start ({start}) is beyond the end of '{path}' "
+            f"({total} line{'s' if total != 1 else ''} total)."
+        )
+
+    actual_end = min(end, total)
+    snippet = lines[start - 1 : actual_end]
+    header = f"--- {path} (Lines {start}-{actual_end} of {total}){encoding_note} ---\n"
+    return header + "".join(snippet)
 
 def create_file(path: str, content: str) -> str:
     try:

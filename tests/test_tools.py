@@ -49,6 +49,51 @@ def test_file_read_and_write(tmp_path):
     fail_result = write_or_replace(file_path, old_text="print(Hello)", new_text="print('Fail')")
     assert "Error: 'old_text' exactly as provided was not found" in fail_result
 
+def test_read_lines_shows_total_count(tmp_path):
+    f = tmp_path / "sample.py"
+    f.write_text("a\nb\nc\n")
+    result = read_file_lines(str(f), 1, 2)
+    assert "of 3" in result
+    assert "Lines 1-2" in result
+
+
+def test_read_lines_start_beyond_eof(tmp_path):
+    f = tmp_path / "short.py"
+    f.write_text("only one line\n")
+    result = read_file_lines(str(f), 50, 60)
+    assert "[TOOL_ERROR]" in result
+    assert "1" in result
+
+
+def test_read_lines_inverted_range(tmp_path):
+    f = tmp_path / "inv.py"
+    f.write_text("a\nb\nc\n")
+    result = read_file_lines(str(f), 5, 2)
+    assert "[TOOL_ERROR]" in result
+
+
+def test_read_lines_clamps_end_to_eof(tmp_path):
+    f = tmp_path / "small.py"
+    f.write_text("x\ny\n")
+    result = read_file_lines(str(f), 1, 999)
+    assert "Lines 1-2 of 2" in result
+
+
+def test_read_lines_latin1_fallback(tmp_path):
+    f = tmp_path / "latin.txt"
+    f.write_bytes(b"caf\xe9\n")  # 'café' in latin-1, invalid UTF-8
+    result = read_file_lines(str(f), 1, 1)
+    assert "latin-1" in result
+    assert "[TOOL_ERROR]" not in result
+
+
+def test_read_lines_start_zero_clamped(tmp_path):
+    f = tmp_path / "clamped.py"
+    f.write_text("line1\nline2\n")
+    result = read_file_lines(str(f), 0, 1)
+    assert "line1" in result
+
+
 # --- Terminal Sandbox Tests ---
 
 def test_terminal_sandbox_whitelist():
