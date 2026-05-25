@@ -89,7 +89,7 @@ gemma-harness --log session.jsonl
 
 The `run` subcommand is also explicit if preferred:
 ```bash
-gemma-harness run --model gemma4:e4b --log session.jsonl
+gemma-harness run
 ```
 
 On startup, if a previous session checkpoint exists (`.gemma_session.json`), the harness will ask whether to resume it or start fresh. Both the session file and `harness_config.json` are workspace-local — run the harness from whichever directory you want the agent to operate on.

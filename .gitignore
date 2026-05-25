@@ -29,6 +29,11 @@ Thumbs.db
 *.log
 *.sqlite3
 
+# Package build artefacts
+build/
+dist/
+*.egg-info/
+
 # Testing and coverage
 .pytest_cache/
 .coverage

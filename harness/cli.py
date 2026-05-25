@@ -77,26 +77,21 @@ def main() -> None:
         prog="gemma-harness",
         description="Lightweight autonomous AI agent harness for local Ollama models",
     )
+    # Flags belong on the top-level parser so they can appear in any position
+    # relative to an optional subcommand (e.g. --model M run or run --model M).
+    parser.add_argument("--log", metavar="FILE", help="Log all agent events to FILE as JSONL")
+    parser.add_argument("--model", default="gemma4:e4b", metavar="TAG",
+                        help="Ollama model tag to use (default: gemma4:e4b)")
+    parser.add_argument("--ollama-url", default="http://127.0.0.1:11434", metavar="URL",
+                        dest="ollama_url", help="Ollama base URL (default: http://127.0.0.1:11434)")
+
     subparsers = parser.add_subparsers(dest="command")
-
-    # gemma-harness init
     subparsers.add_parser("init", help=f"Create a starter {_CONFIG_FILE} in the current directory")
-
-    # gemma-harness run  (also the default when no subcommand is given)
-    run_parser = subparsers.add_parser("run", help="Start the interactive agent (default)")
-    run_parser.add_argument("--log", metavar="FILE", help="Log all agent events to FILE as JSONL")
-    run_parser.add_argument("--model", default="gemma4:e4b", metavar="TAG",
-                            help="Ollama model tag to use (default: gemma4:e4b)")
-    run_parser.add_argument("--ollama-url", default="http://127.0.0.1:11434", metavar="URL",
-                            dest="ollama_url", help="Ollama base URL (default: http://127.0.0.1:11434)")
+    subparsers.add_parser("run", help="Start the interactive agent (default)")
 
     args = parser.parse_args()
 
     if args.command == "init":
         _cmd_init()
     else:
-        # Plain `gemma-harness` or `gemma-harness run` — both land here
-        if args.command is None:
-            # Re-parse treating all args as run-parser args
-            args = run_parser.parse_args()
         _cmd_run(args)
