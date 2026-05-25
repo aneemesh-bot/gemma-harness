@@ -51,8 +51,8 @@ def execute_command(command: str) -> str:
         output = result.stdout + result.stderr
         lines = output.splitlines()
         if len(lines) > 50:
-            truncated = "\n".join(lines[-50:])
-            output = f"[Output too long. Truncated... Showing last 50 lines]\n{truncated}"
+            truncated = "\n".join(lines[:50])
+            output = f"{truncated}\n[OUTPUT TRUNCATED — {len(lines)} lines total, showing first 50. Use a more specific command to see the rest.]"
             
         status = "Success" if result.returncode == 0 else f"Failed (Exit Code {result.returncode})"
         return f"Command Status: {status}\nOutput:\n{output.strip()}"

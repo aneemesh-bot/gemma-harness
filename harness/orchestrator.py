@@ -4,6 +4,7 @@ from .llm_client import OllamaClient
 from .context_manager import ContextManager
 from .tools import get_tool_registry
 from .prompt import get_system_message
+from .session import save_session
 
 class AgentOrchestrator:
     """
@@ -12,8 +13,9 @@ class AgentOrchestrator:
     """
     def __init__(self, model_name: str = "gemma4:e4b"):
         self.llm_client = OllamaClient(model=model_name)
-        # Initialize ContextManager with the client so it can perform summarization
-        self.context_manager = ContextManager(max_tokens=8192, threshold_pct=0.8, llm_client=self.llm_client)
+        # Dynamically read the model's actual context window; fall back to 8192
+        num_ctx = self.llm_client.get_num_ctx()
+        self.context_manager = ContextManager(max_tokens=num_ctx, threshold_pct=0.8, llm_client=self.llm_client)
         self.tool_registry = get_tool_registry()
         
         # Inject the immutable System Prompt
@@ -60,12 +62,14 @@ class AgentOrchestrator:
                 
                 # 5. Check for the stopping condition
                 if tool_result.startswith("TASK_COMPLETE:"):
+                    save_session(self.context_manager.messages)
                     yield ("complete", tool_result.replace("TASK_COMPLETE:", "").strip())
                     break
-                    
+
                 # 6. Feed the observation back to the model
                 observation_msg = f"Observation:\n{tool_result}"
                 self.context_manager.add_message({"role": "user", "content": observation_msg})
+                save_session(self.context_manager.messages)
                 yield ("observation", tool_result)
                 
             else:

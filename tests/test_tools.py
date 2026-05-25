@@ -23,7 +23,8 @@ def test_registry_parsing():
     
     # Test missing tool
     result = registry.execute('{"tool": "subtract", "a": 5}')
-    assert "Error: Tool 'subtract' is not recognized" in result
+    assert "[TOOL_NOT_FOUND]" in result
+    assert "subtract" in result
 
 # --- File Ops Tests ---
 

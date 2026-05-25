@@ -24,21 +24,22 @@ class ToolRegistry:
             tool_name = data.get("tool")
             
             if not tool_name:
-                return "Error: Tool name not provided in JSON."
-            
+                return "[TOOL_NOT_FOUND] Tool name not provided in JSON."
+
             if tool_name not in self.tools:
-                return f"Error: Tool '{tool_name}' is not recognized."
-            
+                available = list(self.tools.keys())
+                return f"[TOOL_NOT_FOUND] Tool '{tool_name}' is not recognized. Available tools: {available}"
+
             # Extract arguments by removing the 'tool' key
             kwargs = {k: v for k, v in data.items() if k != "tool"}
-            
+
             # Execute tool safely
             result = self.tools[tool_name](**kwargs)
             return str(result)
-            
+
         except json.JSONDecodeError:
-            return "Error: Invalid JSON format. Please ensure your output is valid JSON."
+            return "[PARSE_ERROR] Invalid JSON format. Please ensure your output is valid JSON wrapped in ```json ``` tags."
         except TypeError as e:
-            return f"Error: Invalid arguments provided for the tool. {str(e)}"
+            return f"[EXECUTION_ERROR] Invalid arguments provided for the tool. {str(e)}"
         except Exception as e:
-            return f"Error executing tool: {str(e)}"
+            return f"[EXECUTION_ERROR] {str(e)}"

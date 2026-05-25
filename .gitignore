@@ -13,6 +13,7 @@ env/
 
 # User-specific / Workspace configurations
 harness_config.json
+*_session.json
 
 # IDEs and Editors
 .vscode/
@@ -32,3 +33,6 @@ Thumbs.db
 .pytest_cache/
 .coverage
 htmlcov/
+
+# Agentic files
+UPGRADES.md

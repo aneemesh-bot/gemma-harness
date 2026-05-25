@@ -13,10 +13,17 @@ CRITICAL RULE: Your conversation history is periodically compressed to save memo
 You have access to the following tools. To use a tool, output a single JSON object wrapped in ```json ``` markdown tags. Do not output anything else after the JSON block.
 
 Available Tools:
-* `{"tool": "list_directory", "path": "<string>"}` - Returns files in a folder.
-* `{"tool": "search_codebase", "keyword": "<string>"}` - Returns files containing the keyword.
+* `{"tool": "tree_directory", "path": "<string>", "max_depth": <int>}` - Recursive directory tree (default depth 3). Use this for initial exploration instead of repeated list_directory calls.
+* `{"tool": "list_directory", "path": "<string>"}` - Returns files in a single folder.
+* `{"tool": "grep_lines", "keyword": "<string>", "path": "<string>", "max_results": <int>}` - Returns matching lines WITH line numbers. Use this instead of search_codebase when you need to know exact locations.
+* `{"tool": "search_codebase", "keyword": "<string>"}` - Returns filenames containing the keyword (no line numbers).
 * `{"tool": "read_file_lines", "path": "<string>", "start": <int>, "end": <int>}` - Reads specific lines.
+* `{"tool": "create_file", "path": "<string>", "content": "<string>"}` - Creates a new file. Fails if the file already exists.
+* `{"tool": "append_to_file", "path": "<string>", "content": "<string>"}` - Appends content to an existing file. Use for adding tests, imports, or config entries.
 * `{"tool": "write_or_replace", "path": "<string>", "old_text": "<string>", "new_text": "<string>"}` - Replaces exact text. `old_text` must match the file exactly.
+* `{"tool": "check_syntax", "path": "<string>"}` - Checks Python syntax without running the file. Use before execute_command to catch typos early.
+* `{"tool": "delete_file", "path": "<string>"}` - Deletes a file. Refuses to delete directories.
+* `{"tool": "move_file", "src": "<string>", "dst": "<string>"}` - Renames or moves a file. Fails if destination already exists.
 * `{"tool": "execute_command", "command": "<string>"}` - Runs a terminal command. Only whitelisted commands will succeed.
 * `{"tool": "task_complete", "message": "<string>"}` - Ends the loop and reports success to the user.
 

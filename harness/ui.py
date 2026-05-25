@@ -1,4 +1,5 @@
 import sys
+import json
 from rich.console import Console
 from rich.panel import Panel
 from rich.markdown import Markdown
@@ -20,8 +21,14 @@ class TerminalUI:
     """
     Handles the rendering of the agent's state, streaming output, and tool results.
     """
-    def __init__(self, orchestrator):
+    def __init__(self, orchestrator, log_file: str = None):
         self.orchestrator = orchestrator
+        self.log_file = log_file
+
+    def _log(self, event_type: str, data: str) -> None:
+        if self.log_file:
+            with open(self.log_file, "a", encoding="utf-8") as f:
+                f.write(json.dumps({"event": event_type, "data": data}) + "\n")
 
     def process_task(self, prompt: str):
         """Runs the orchestrator and manages the live terminal updates."""
@@ -30,8 +37,10 @@ class TerminalUI:
         # We use a simple state machine to manage the streaming output
         current_status = "Initializing..."
         
+        self._log("user_input", prompt)
         try:
             for event_type, data in self.orchestrator.run_task(prompt):
+                self._log(event_type, data)
                 if event_type == "status":
                     # Print status updates in a muted color
                     console.print(f"\n[info]⚙ {data}[/info]")
